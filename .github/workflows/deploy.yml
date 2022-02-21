@@ -28,6 +28,13 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
-            **/dist/**
+            **/src/**
+            **/test/**
             package-lock.json
             pnpm-lock.yaml
+            .eslintrc.js
+            .gitignore
+            .prettierrc
+            .README.md
+            .tsconfig.build.json
+            .tsconfig.json
