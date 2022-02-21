@@ -24,5 +24,7 @@ jobs:
           server: ${{ secrets.SERVER }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          local-dir: ./dist/
-          server-dir: ./
+          exclude:  |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
