@@ -1,46 +1,34 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UserService } from '../service/user.service';
-import {
-  CreateUserInfoReqDto,
-  QueryUserInfoReqDto,
-  QueryUserInfoResDto,
-  QueryUserListResDto,
-} from '@src/user/dto/user.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { UserRegistryReqDto } from '@src/user/dto/user-registry';
+import { User } from '@common/decorator/user.decorator';
+import { UserEntity } from '@src/user/schema/mysql/user.entity';
+import { UserInfo } from '@src/user/dto/user.dto';
+import { JwtAuthGuard } from '@src/user/guard/jwt-auth.guard';
+import { LocalAuthGuard } from '../guard/local-auth.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Post('login')
+  @UseGuards(LocalAuthGuard)
+  @ApiOperation({ summary: '登录' })
+  async login(@User() user: UserInfo) {
+    return this.userService.login(user);
+  }
+
   @Get('info')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '查询用户信息' })
-  async getUserInfo(
-    @Query() query: QueryUserInfoReqDto,
-  ): Promise<QueryUserInfoResDto> {
-    return {
-      data: await this.userService.getUserInfo(query.userId),
-    };
+  async getUserInfo(@User() user: UserEntity): Promise<UserInfo> {
+    return user;
   }
 
-  @Post('info')
-  @ApiOperation({ summary: '创建用户' })
-  async createUser(@Body() body: CreateUserInfoReqDto): Promise<{
-    code: number;
-    message: string;
-  }> {
-    const isCreateSuccess = await this.userService.createUser(body);
-
-    return {
-      code: isCreateSuccess ? 0 : 1,
-      message: isCreateSuccess ? '创建成功' : '创建失败',
-    };
-  }
-
-  @Get('list')
-  @ApiOperation({ summary: '查询用户列表' })
-  async getUserList(): Promise<QueryUserListResDto> {
-    return {
-      data: await this.userService.getUserList(),
-    };
+  @Post('registry')
+  @ApiOperation({ summary: '注册' })
+  async registry(@Body() body: UserRegistryReqDto): Promise<void> {
+    return await this.userService.registry(body);
   }
 }

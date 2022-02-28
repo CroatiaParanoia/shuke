@@ -12,22 +12,21 @@ export class QueryUserInfoReqDto {
 }
 
 export class QueryUserInfoResDto {
-  @ApiProperty()
+  @ApiProperty({ type: () => UserEntity })
   data: UserEntity;
 }
 
+export type UserInfo = Omit<UserEntity, 'password'>;
+
 export class CreateUserInfoReqDto {
   @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  description: string;
+  nickname: string;
 
   @ApiProperty({ type: 'enum', enum: Gender })
   gender: Gender;
 }
 
 export class QueryUserListResDto {
-  @ApiProperty()
+  @ApiProperty({ type: () => UserEntity, isArray: true })
   data: UserEntity[];
 }

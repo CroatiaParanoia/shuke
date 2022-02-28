@@ -6,14 +6,20 @@ export const UserEntityTable = 'user';
 
 @Entity({ name: UserEntityTable })
 export class UserEntity extends BaseEntity {
+  @Column({ type: 'varchar', length: 18, comment: '用户名' })
+  username: string;
+
+  @Column({ type: 'varchar', length: 200, select: false, comment: '密码' })
+  password: string;
+
+  @Column({ type: 'varchar', length: 24, comment: '邮箱' })
+  email: string;
+
   @Column({
     type: 'varchar',
-    length: 200,
+    length: 50,
   })
-  name: string;
-
-  @Column()
-  description: string;
+  nickname: string;
 
   @Column({
     type: 'enum',
