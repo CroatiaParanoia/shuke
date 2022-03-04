@@ -1,19 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../schema/mysql/user.entity';
+import { Gender, UserEntity } from '../schema/mysql/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MysqlDB } from '@common/constant/db.constant';
-import { Gender, UserInfo } from '@src/user/dto/user.dto';
+import { UserInfo } from '@src/user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserRegistryReqDto } from '@src/user/dto/user-registry';
+import { UserRegistryReqDto } from '@src/user/dto/user-registry.dto';
 import { BusinessException } from '@common/exception/business-exception';
 import { ResponseErrorCode } from '@common/constant/response-code.constant';
 import { AppConfigService } from '@common/app-config/service/app-config.service';
-
-interface IUser {
-  username: string;
-  userId: number;
-}
+import { JwtPayload } from '@common/typings/types';
 
 @Injectable()
 export class UserService {
@@ -42,15 +38,19 @@ export class UserService {
     return null;
   }
 
-  async login(user: UserInfo): Promise<{ token: string }> {
-    const token = this.jwtSign({ username: user.username, id: user.id });
+  async login({ username, id, ...otherUserInfo }: UserInfo): Promise<UserInfo> {
+    const token = this.jwtSign({ username: username, id });
+
     return {
       token,
+      id,
+      username,
+      ...otherUserInfo,
     };
   }
 
   async isUserExist(username: string) {
-    const user = await this.userRepo.findOne({ where: { username } });
+    const user = await this.userRepo.findOne(username);
 
     return Boolean(user);
   }
@@ -62,11 +62,14 @@ export class UserService {
       throw new BusinessException(ResponseErrorCode.USER_EXIST);
     }
 
+    if (await this.userRepo.findOne({ email })) {
+      throw new BusinessException(ResponseErrorCode.EMAIL_EXIST);
+    }
+
     const uglifyPassword = await this.appConfigService.uglifyUserPassword(
       password,
     );
 
-    console.log(uglifyPassword, 'uglifyPassword');
     await this.userRepo.save({
       username,
       password: uglifyPassword,
@@ -88,7 +91,7 @@ export class UserService {
     return user as UserInfo;
   }
 
-  jwtSign(payload: { username: string; id: number }) {
+  jwtSign(payload: JwtPayload) {
     return this.jwtService.sign(payload);
   }
 }

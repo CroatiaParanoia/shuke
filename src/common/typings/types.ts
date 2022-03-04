@@ -1,7 +1,5 @@
-export class BasicResponse<T> {
-  code: number;
+export interface JwtPayload {
+  username: string;
 
-  data: T;
-
-  message: string;
+  id: number;
 }

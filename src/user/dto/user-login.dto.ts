@@ -1,9 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { PickType } from '@nestjs/swagger';
+import { UserInfo } from '@src/user/dto/user.dto';
+import { UserEntity } from '@src/user/schema/mysql/user.entity';
 
-export class UserLoginReqDto {
-  @ApiProperty()
-  username: string;
+export class UserLoginReqDto extends PickType(UserEntity, [
+  'username',
+  'password',
+] as const) {}
 
-  @ApiProperty()
-  password: string;
-}
+export class UserLoginResDto extends UserInfo {}

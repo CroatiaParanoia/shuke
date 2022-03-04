@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from '@common/filter/http-exception.filter';
 import { VersioningType } from '@nestjs/common';
 import { TransformInterceptor } from '@common/interceptor/transform.interceptor';
+import { ValidationPipe } from '@common/pipe/validate.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,11 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new TransformInterceptor());
+
+  app.useGlobalPipes(new ValidationPipe());
+
   const config = new DocumentBuilder()
     .setTitle('Shuke example')
     .setDescription('The shuke API description')
@@ -20,10 +26,7 @@ async function bootstrap() {
     .addTag('nestjs')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new TransformInterceptor());
+  SwaggerModule.setup('api', app, document, {});
 
   await app.listen(8100);
 }
