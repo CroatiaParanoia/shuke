@@ -10,7 +10,7 @@ import { UserLoginReqDto, UserLoginResDto } from '@src/user/dto/user-login.dto';
 import {
   ApiPaginatedResponse,
   ApiResponse,
-} from '@common/decorator/paginated-response.decorator';
+} from '@common/decorator/response.decorator';
 
 @Controller('user')
 export class UserController {
