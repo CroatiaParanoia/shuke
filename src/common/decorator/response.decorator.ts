@@ -41,6 +41,7 @@ export const ApiResponse = <TModel extends Type<any>>(model: TModel) => {
           },
         ],
       },
+      status: 201,
     }),
   );
 };

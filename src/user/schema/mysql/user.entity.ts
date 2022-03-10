@@ -1,4 +1,4 @@
-import { BaseEntity } from '@common/entities/base.entity';
+import { UserAbstractEntity } from '@common/entities/base.entity';
 import { Column, Entity } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -10,7 +10,7 @@ export enum Gender {
 }
 
 @Entity({ name: UserEntityTable })
-export class UserEntity extends BaseEntity {
+export class UserEntity extends UserAbstractEntity {
   /**
    * 用户名
    */
@@ -53,8 +53,5 @@ export class UserEntity extends BaseEntity {
   /**
    * token
    */
-  @ApiProperty({
-    description: 'token',
-  })
   token: string;
 }

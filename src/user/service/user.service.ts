@@ -55,7 +55,7 @@ export class UserService {
     return Boolean(user);
   }
 
-  async registry(body: UserRegistryReqDto) {
+  async registry(body: UserRegistryReqDto): Promise<UserInfo> {
     const { username, password, email } = body;
 
     if (await this.isUserExist(username)) {
@@ -70,7 +70,7 @@ export class UserService {
       password,
     );
 
-    await this.userRepo.save({
+    const { id } = await this.userRepo.save({
       username,
       password: uglifyPassword,
       email,
@@ -78,7 +78,7 @@ export class UserService {
       gender: Gender.Male,
     });
 
-    return null;
+    return this.getUserInfo(id);
   }
 
   async getUserInfo(userId: number): Promise<UserInfo> {

@@ -1,7 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { UserService } from '@src/user/service/user.service';
+import { BusinessException } from '@common/exception/business-exception';
+import { ResponseErrorCode } from '@common/constant/response-code.constant';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -13,7 +15,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const user = await this.userService.validateUser(username, password);
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new BusinessException(ResponseErrorCode.USER_OR_PASSWORD_ERROR);
     }
     return user;
   }

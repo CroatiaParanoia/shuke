@@ -30,15 +30,25 @@ export class UserController {
   @Get('info')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiPaginatedResponse(UserInfo)
+  @ApiResponse(UserInfo)
   @ApiOperation({ summary: '查询用户信息' })
-  async getUserInfo(@User() user: UserInfo): Promise<UserInfo[]> {
+  async getUserInfo(@User() user: UserInfo): Promise<UserInfo> {
+    return user;
+  }
+
+  @Get('list')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiPaginatedResponse(UserInfo)
+  @ApiOperation({ summary: '查询用户列表' })
+  async getUserList(@User() user: UserInfo): Promise<UserInfo[]> {
     return [user];
   }
 
   @Post('registry')
   @ApiOperation({ summary: '注册' })
-  async registry(@Body() body: UserRegistryReqDto) {
+  @ApiResponse(UserInfo)
+  async registry(@Body() body: UserRegistryReqDto): Promise<UserInfo> {
     return await this.userService.registry(body);
   }
 }
