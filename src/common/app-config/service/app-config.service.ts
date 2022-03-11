@@ -6,9 +6,11 @@ import * as CryptoJs from 'crypto-js';
 
 @Injectable()
 class AppConfigService {
-  DATABASE_PORT;
-
   constructor(private readonly configService: ConfigService) {}
+
+  get port() {
+    return Number(this.configService.get<number>('PORT'));
+  }
 
   get dbConfig(): MysqlConnectionOptions {
     return {

@@ -13,6 +13,7 @@ import { AppConfigService } from '@common/app-config/service/app-config.service'
     AppConfigModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [],
     }),
     TypeOrmModule.forRootAsync({
       name: MysqlDB.Shuke,
