@@ -1,0 +1,46 @@
+on:
+  push:
+    branches:
+      - master
+name: 🚀 【Production】Deploy website on push
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: 🔨 Build Project
+        run: |
+          npm ci
+          npm run build
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.2.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/src/**
+            **/test/**
+            package-lock.json
+            pnpm-lock.yaml
+            .eslintrc.js
+            .gitignore
+            .prettierrc
+            .README.md
+            .tsconfig.build.json
+            .tsconfig.json

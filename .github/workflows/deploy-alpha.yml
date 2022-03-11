@@ -1,29 +1,15 @@
 on:
   push:
     branches:
-      - master
       - alpha
-name: 🚀 Deploy website on push
+name: 🚀 【Alpha】Deploy website on push
 jobs:
   web-deploy:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
-
-
-
+    environment: alpha
 
     steps:
-
-      - name: Set Production Env
-        if: github.ref == 'refs/heads/master'
-        env:
-          use: production
-
-      - name: Set Alpha Env
-        if: github.ref == 'refs/heads/alpha'
-        env:
-          use: alpha
-
 
       - name: 🚚 Get latest code
         uses: actions/checkout@v2
