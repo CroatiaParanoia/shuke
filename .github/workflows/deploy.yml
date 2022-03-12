@@ -1,18 +1,47 @@
 on:
   push:
     branches:
+      - master
       - alpha
-name: 🚀 【Alpha】Deploy website on push
+
+name: 🚀 Deploy nestjs on push
 jobs:
-  web-deploy:
-    name: 🎉 Deploy
+  job1:
+    name: 🐸 compute-env-name
     runs-on: ubuntu-latest
-    environment: alpha
+    outputs:
+      env_name: ${{ steps.step1.outputs.env_name }}
+    steps:
+      - name: get env name
+        id: step1
+        run: |
+          branch_name=${refs: 11}
+          if [ "$branch_name" = "master" ]; then
+            env_name="production"
+          else
+            env_name=$branch_name
+          fi
+          echo "环境：${env_name}"
+          echo "::set-output name=env_name::$env_name"
+
+        env:
+          refs: ${{github.ref}}
+
+  nestjs-deploy:
+    name: 🎉 【${{ needs.job1.outputs.env_name }}】Deploy
+    runs-on: ubuntu-latest
+    environment: ${{ needs.job1.outputs.env_name }}
 
     steps:
 
       - name: 🚚 Get latest code
         uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Use Node.js 14
         uses: actions/setup-node@v2
@@ -30,7 +59,6 @@ jobs:
           echo DATABASE_NAME_1=${{ secrets.DATABASE_NAME_1 }} >> .env
           echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
           echo USER_PASSWORD_SECRET=${{ secrets.USER_PASSWORD_SECRET }} >> .env
-
 
       - name: 🔨 Build Project
         run: |
