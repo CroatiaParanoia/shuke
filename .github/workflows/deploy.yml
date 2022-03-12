@@ -31,6 +31,7 @@ jobs:
     name: 🎉 【${{ needs.job1.outputs.env_name }}】Deploy
     runs-on: ubuntu-latest
     environment: ${{ needs.job1.outputs.env_name }}
+    needs: job1
 
     steps:
 
