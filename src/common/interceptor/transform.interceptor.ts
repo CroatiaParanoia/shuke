@@ -6,6 +6,10 @@ import {
 } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import {
+  ResponseErrorMsgMapping,
+  ResponseErrorType,
+} from '@common/constant/response-code.constant';
 
 interface Response<T> {
   data: T;
@@ -21,10 +25,14 @@ export class TransformInterceptor<T>
   ): Observable<Response<T>> {
     return next.handle().pipe(
       map((data) => {
+        const { message, code } = ResponseErrorMsgMapping.get(
+          ResponseErrorType.SUCCESS,
+        );
         return {
           data,
-          code: 0,
-          message: 'success',
+          code,
+          message,
+          errType: ResponseErrorType.SUCCESS,
         };
       }),
     );

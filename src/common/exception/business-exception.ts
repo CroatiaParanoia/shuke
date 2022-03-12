@@ -1,14 +1,14 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import {
-  ResponseErrorCode,
   ResponseErrorMsgMapping,
+  ResponseErrorType,
 } from '@common/constant/response-code.constant';
 
 export class BusinessException extends HttpException {
-  constructor(code: ResponseErrorCode, statusCode: number = HttpStatus.OK) {
-    const message = ResponseErrorMsgMapping.get(code);
+  constructor(errType: ResponseErrorType, statusCode: number = HttpStatus.OK) {
+    const { message, code } = ResponseErrorMsgMapping.get(errType);
 
-    const errorJson = JSON.stringify({ code, message });
+    const errorJson = JSON.stringify({ code, message, errType });
 
     super(errorJson, statusCode);
   }

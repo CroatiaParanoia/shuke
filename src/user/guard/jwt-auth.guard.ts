@@ -1,9 +1,7 @@
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { BusinessException } from '@common/exception/business-exception';
+import { ResponseErrorType } from '@common/constant/response-code.constant';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -16,7 +14,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   handleRequest(err, user, info): any {
     // 可以抛出一个基于info或者err参数的异常
     if (err || !user) {
-      throw err || new UnauthorizedException();
+      throw err || new BusinessException(ResponseErrorType.TOKEN_EXPIRED);
     }
     return user;
   }

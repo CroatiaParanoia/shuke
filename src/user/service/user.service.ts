@@ -7,7 +7,7 @@ import { UserInfo } from '@src/user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserRegistryReqDto } from '@src/user/dto/user-registry.dto';
 import { BusinessException } from '@common/exception/business-exception';
-import { ResponseErrorCode } from '@common/constant/response-code.constant';
+import { ResponseErrorType } from '@common/constant/response-code.constant';
 import { AppConfigService } from '@common/app-config/service/app-config.service';
 import { JwtPayload } from '@common/typings/types';
 
@@ -50,8 +50,13 @@ export class UserService {
   }
 
   async isUserExist(username: string) {
-    const user = await this.userRepo.findOne(username);
+    const user = await this.userRepo.findOne({ username });
 
+    return Boolean(user);
+  }
+
+  async isEmailExist(email: string) {
+    const user = await this.userRepo.findOne({ email });
     return Boolean(user);
   }
 
@@ -59,18 +64,18 @@ export class UserService {
     const { username, password, email } = body;
 
     if (await this.isUserExist(username)) {
-      throw new BusinessException(ResponseErrorCode.USER_EXIST);
+      throw new BusinessException(ResponseErrorType.USER_EXIST);
     }
 
-    if (await this.userRepo.findOne({ email })) {
-      throw new BusinessException(ResponseErrorCode.EMAIL_EXIST);
+    if (await this.isEmailExist(email)) {
+      throw new BusinessException(ResponseErrorType.EMAIL_EXIST);
     }
 
     const uglifyPassword = await this.appConfigService.uglifyUserPassword(
       password,
     );
 
-    const { id } = await this.userRepo.save({
+    const userInfo = await this.userRepo.save({
       username,
       password: uglifyPassword,
       email,
@@ -78,7 +83,7 @@ export class UserService {
       gender: Gender.Male,
     });
 
-    return this.getUserInfo(id);
+    return await this.login(userInfo);
   }
 
   async getUserInfo(userId: number): Promise<UserInfo> {

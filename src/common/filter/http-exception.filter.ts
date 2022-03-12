@@ -7,6 +7,7 @@ import {
 import { Request, Response } from 'express';
 import { jsonSafeParse } from '@common/utils/utils';
 import { AbstractResponseDto } from '@common/dto/response.dto';
+import { ResponseErrorType } from '@common/constant/response-code.constant';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
@@ -35,6 +36,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
       status,
       code: errInfo.code || 1,
       message: errInfo.message || exception.message,
+      errType: errInfo.errType || ResponseErrorType.SUCCESS,
       // exceptionMsg: exception.message,
       // exceptionStack: exception.stack,
       path: request.url,
