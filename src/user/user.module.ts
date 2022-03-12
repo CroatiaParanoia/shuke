@@ -20,7 +20,7 @@ import { LocalStrategy } from '@src/user/strategy/local.strategy';
       useFactory(appConfigService: AppConfigService) {
         return {
           secret: appConfigService.jwtSecret,
-          signOptions: { expiresIn: '60s' },
+          signOptions: { expiresIn: '3d' },
         };
       },
       inject: [AppConfigService],

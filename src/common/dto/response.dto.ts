@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, ValidateNested } from 'class-validator';
+import { ResponseErrorType } from '@common/constant/response-code.constant';
 
 export class PaginatedDto<TData> {
   @ApiProperty()
@@ -22,8 +23,18 @@ export class PaginatedDto<TData> {
 }
 
 export class AbstractResponseDto<T> {
-  @ApiProperty()
+  /**
+   * 异常码
+   */
   code: number;
+
+  @ApiProperty({
+    enum: ResponseErrorType,
+    type: 'enum',
+    enumName: 'ResponseErrorType',
+    description: '异常码类型',
+  })
+  errType: ResponseErrorType;
 
   @ValidateNested()
   data: T;

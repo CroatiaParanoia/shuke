@@ -48,6 +48,12 @@ export class UserEntity extends UserAbstractEntity {
     enum: Gender,
     comment: '性别',
   })
+  @ApiProperty({
+    enum: Gender,
+    type: 'enum',
+    description: '性别',
+    enumName: 'Gender',
+  })
   gender: Gender;
 
   /**
