@@ -7,6 +7,7 @@ import { MysqlDB } from '@common/constant/db.constant';
 import { UserModule } from './user/user.module';
 import { AppConfigModule } from '@common/app-config/app-config.module';
 import { AppConfigService } from '@common/app-config/service/app-config.service';
+import { DreamModule } from '@dream/dream.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AppConfigService } from '@common/app-config/service/app-config.service'
       inject: [AppConfigService],
     }),
     UserModule,
+    DreamModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UserController } from '@src/user/controller/user.controller';
 import { UserService } from '@src/user/service/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,6 +10,7 @@ import { AppConfigModule } from '@common/app-config/app-config.module';
 import { AppConfigService } from '@common/app-config/service/app-config.service';
 import { JwtStrategy } from '@src/user/strategy/jwt.strategy';
 import { LocalStrategy } from '@src/user/strategy/local.strategy';
+import { DreamModule } from '@dream/dream.module';
 
 @Module({
   imports: [
@@ -25,6 +26,8 @@ import { LocalStrategy } from '@src/user/strategy/local.strategy';
       },
       inject: [AppConfigService],
     }),
+
+    forwardRef(() => DreamModule),
   ],
   controllers: [UserController],
   providers: [UserService, JwtStrategy, LocalStrategy],

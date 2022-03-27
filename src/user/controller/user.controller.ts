@@ -11,10 +11,15 @@ import {
   ApiPaginatedResponse,
   ApiResponse,
 } from '@common/decorator/response.decorator';
+import { DreamEntity } from '@dream/schema/mysql/dream.entity';
+import { DreamService } from '@dream/service/dream.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly dreamService: DreamService,
+  ) {}
 
   @Post('login')
   @UseGuards(LocalAuthGuard)
@@ -50,5 +55,14 @@ export class UserController {
   @ApiResponse(UserInfo)
   async registry(@Body() body: UserRegistryReqDto): Promise<UserInfo> {
     return await this.userService.registry(body);
+  }
+
+  @Get('dreams')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiPaginatedResponse(DreamEntity)
+  @ApiOperation({ summary: '查询用户做过的梦' })
+  async getUserDreams(@User() user: UserInfo) {
+    return this.userService.getDreams(user.id);
   }
 }

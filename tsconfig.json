@@ -21,6 +21,12 @@
       "@common/*": [
         "src/common/*"
       ],
+      "@user/*": [
+        "src/user/*"
+      ],
+      "@dream/*": [
+        "src/dream/*"
+      ],
       "@src/*": [
         "src/*"
       ]

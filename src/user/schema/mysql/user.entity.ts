@@ -1,16 +1,18 @@
-import { UserAbstractEntity } from '@common/entities/base.entity';
-import { Column, Entity } from 'typeorm';
+import { AbstractEntity } from '@common/entities/base.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { DreamEntity } from '@dream/schema/mysql/dream.entity';
 
 export const UserEntityTable = 'user';
 
 export enum Gender {
   Male = 'male',
   Female = 'female',
+  Unknown = 'unknown',
 }
 
 @Entity({ name: UserEntityTable })
-export class UserEntity extends UserAbstractEntity {
+export class UserEntity extends AbstractEntity {
   /**
    * 用户名
    */
@@ -60,4 +62,7 @@ export class UserEntity extends UserAbstractEntity {
    * token
    */
   token: string;
+
+  @OneToMany(() => DreamEntity, (dream) => dream.user)
+  dreams: DreamEntity[];
 }

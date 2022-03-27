@@ -42,10 +42,10 @@ export class UserService {
     const token = this.jwtSign({ username: username, id });
 
     return {
-      token,
+      ...otherUserInfo,
       id,
       username,
-      ...otherUserInfo,
+      token,
     };
   }
 
@@ -87,16 +87,29 @@ export class UserService {
   }
 
   async getUserInfo(userId: number): Promise<UserInfo> {
-    const user = await this.userRepo.findOne({
-      where: {
-        id: userId,
-      },
-    });
+    const user = await this.getUser(userId);
 
     return user as UserInfo;
   }
 
+  async getUser(userId: number): Promise<UserEntity> {
+    return await this.userRepo.findOne({
+      where: {
+        id: userId,
+      },
+    });
+  }
+
   jwtSign(payload: JwtPayload) {
     return this.jwtService.sign(payload);
+  }
+
+  async getDreams(userId: number) {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      relations: ['dreams'],
+    });
+
+    return user.dreams;
   }
 }
