@@ -1,7 +1,6 @@
 import { AbstractEntity } from '@common/entities/base.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { DreamEntity } from '@dream/schema/mysql/dream.entity';
 
 export const UserEntityTable = 'user';
 
@@ -63,6 +62,6 @@ export class UserEntity extends AbstractEntity {
    */
   token: string;
 
-  @OneToMany(() => DreamEntity, (dream) => dream.user)
-  dreams: DreamEntity[];
+  // @OneToMany(() => DreamEntity, (dream) => dream.user)
+  // dreams: DreamEntity[];
 }

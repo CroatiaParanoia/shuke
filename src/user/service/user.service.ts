@@ -1,15 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Gender, UserEntity } from '../schema/mysql/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MysqlDB } from '@common/constant/db.constant';
-import { UserInfo } from '@src/user/dto/user.dto';
+import {
+  PrivateUserInfo,
+  PublicUserInfo,
+  UserInfo,
+} from '@src/user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserRegistryReqDto } from '@src/user/dto/user-registry.dto';
 import { BusinessException } from '@common/exception/business-exception';
 import { ResponseErrorType } from '@common/constant/response-code.constant';
 import { AppConfigService } from '@common/app-config/service/app-config.service';
 import { JwtPayload } from '@common/typings/types';
+import { omit } from 'lodash';
+import { DreamService } from '@dream/service/dream.service';
+import { map } from 'modern-async';
 
 @Injectable()
 export class UserService {
@@ -18,6 +25,8 @@ export class UserService {
     private readonly userRepo: Repository<UserEntity>,
     private readonly jwtService: JwtService,
     private readonly appConfigService: AppConfigService,
+    @Inject(forwardRef(() => DreamService))
+    private readonly dreamService: DreamService,
   ) {}
 
   async validateUser(
@@ -86,12 +95,6 @@ export class UserService {
     return await this.login(userInfo);
   }
 
-  async getUserInfo(userId: number): Promise<UserInfo> {
-    const user = await this.getUser(userId);
-
-    return user as UserInfo;
-  }
-
   async getUser(userId: number): Promise<UserEntity> {
     return await this.userRepo.findOne({
       where: {
@@ -100,16 +103,41 @@ export class UserService {
     });
   }
 
-  jwtSign(payload: JwtPayload) {
-    return this.jwtService.sign(payload);
+  async getUserInfo(param: number | UserEntity): Promise<UserInfo> {
+    const user = typeof param === 'number' ? await this.getUser(param) : param;
+
+    return omit(user, 'password', 'deleteAt');
   }
 
-  async getDreams(userId: number) {
-    const user = await this.userRepo.findOne({
-      where: { id: userId },
-      relations: ['dreams'],
-    });
+  async getPrivateUser(param: number | UserEntity): Promise<PrivateUserInfo> {
+    const { id: userId, ...otherInfo } = await this.getUserInfo(param);
 
-    return user.dreams;
+    return {
+      ...otherInfo,
+      userId,
+    };
+  }
+
+  async getPublicUser(param: number | UserEntity): Promise<PublicUserInfo> {
+    const user = await this.getPrivateUser(param);
+
+    return omit(user, 'username', 'dreams', 'token', 'createAt', 'updateAt');
+  }
+
+  async getPublicUserMappingByIds(ids: number[]) {
+    const users = await map(
+      await this.userRepo.findByIds(ids),
+      async (user) => {
+        const publicUserInfo = await this.getPublicUser(user);
+
+        return [publicUserInfo.userId, publicUserInfo] as const;
+      },
+    );
+
+    return new Map(users);
+  }
+
+  jwtSign(payload: JwtPayload) {
+    return this.jwtService.sign(payload);
   }
 }

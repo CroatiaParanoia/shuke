@@ -22,6 +22,7 @@ import { DreamModule } from '@dream/dream.module';
       useFactory: (appConfigService: AppConfigService) => ({
         ...appConfigService.dbConfig,
         autoLoadEntities: true,
+        synchronize: true,
       }),
       inject: [AppConfigService],
     }),

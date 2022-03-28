@@ -1,6 +1,5 @@
 import { AbstractEntity } from '@common/entities/base.entity';
-import { UserEntity } from '@user/schema/mysql/user.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { IsBoolean, IsString, Length } from 'class-validator';
 
 export const DreamEntityTable = 'dream';
@@ -22,6 +21,17 @@ export class DreamEntity extends AbstractEntity {
   @IsBoolean()
   isPublic: boolean;
 
-  @ManyToOne(() => UserEntity, (user) => user.dreams)
-  user: UserEntity;
+  // @ManyToOne(() => UserEntity, (user) => user.dreams)
+  // user: UserEntity;
+
+  /**
+   * 用户id
+   */
+  @Column({
+    type: 'int',
+    unsigned: true,
+    nullable: false,
+    comment: '用户id',
+  })
+  userId: number;
 }

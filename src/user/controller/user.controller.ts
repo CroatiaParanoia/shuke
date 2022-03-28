@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  forwardRef,
+  Get,
+  Inject,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRegistryReqDto } from '@src/user/dto/user-registry.dto';
@@ -11,13 +19,14 @@ import {
   ApiPaginatedResponse,
   ApiResponse,
 } from '@common/decorator/response.decorator';
-import { DreamEntity } from '@dream/schema/mysql/dream.entity';
+import { DreamDto } from '@dream/dto/dream.dto';
 import { DreamService } from '@dream/service/dream.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    @Inject(forwardRef(() => DreamService))
     private readonly dreamService: DreamService,
   ) {}
 
@@ -60,9 +69,9 @@ export class UserController {
   @Get('dreams')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiPaginatedResponse(DreamEntity)
+  @ApiPaginatedResponse(DreamDto)
   @ApiOperation({ summary: '查询用户做过的梦' })
-  async getUserDreams(@User() user: UserInfo) {
-    return this.userService.getDreams(user.id);
+  async getUserDreams(@User() user: UserInfo): Promise<DreamDto[]> {
+    return this.dreamService.getDreamListByUserId(user.id);
   }
 }
